@@ -2,7 +2,7 @@
 
 Crowd density estimation using CSRNet on the ShanghaiTech Part B dataset. Given a crowd image, the model outputs a density heatmap and an estimated head count.
 
-![Demo](demo_placeholder.png)
+![Demo](demo.gif)
 
 ## Demo
 
