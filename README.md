@@ -4,6 +4,14 @@ Crowd density estimation using CSRNet on the ShanghaiTech Part B dataset. Given 
 
 ![Demo](demo.gif)
 
+## Contributors
+Group 6 — CSE468, North South University
+
+- Rulia Akter Eti
+- Rakibul Islam Regan  
+- Al-Af Muktadir
+- Md. Mashrur Reza
+  
 ## Demo
 
 Upload any crowd image and get an estimated count + density heatmap instantly.
