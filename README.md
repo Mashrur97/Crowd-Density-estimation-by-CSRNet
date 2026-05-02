@@ -1,22 +1,14 @@
-# CSRNet Crowd Density Estimator
+# CrowdSense — Real-Time Crowd Density Estimation
 
-Crowd density estimation using CSRNet on the ShanghaiTech Part B dataset. Given a crowd image, the model outputs a density heatmap and an estimated head count.
-
-![Demo](demo.gif)
+A web-based crowd density estimation system built on CSRNet (VGG-16 backbone, trained on ShanghaiTech Part B, MAE 9.43). Upload an image or video and get instant headcount, density heatmaps, threshold alerts, and exportable CSV analytics.
 
 ## Contributors
-Group 6 — CSE468, North South University
+Group [X] — CSE428, North South University
 
 - Rulia Akter Eti
-- Rakibul Islam Regan  
+- Rakibul Islam Regan
 - Al-Af Muktadir
-- Md. Mashrur Reza
-  
-## Demo
-
-Upload any crowd image and get an estimated count + density heatmap instantly.
-
-> Best results with overhead/surveillance style images.
+- Md. Mashrur Fardin
 
 ---
 
@@ -24,8 +16,8 @@ Upload any crowd image and get an estimated count + density heatmap instantly.
 
 CSRNet has two components:
 
-- **Frontend** — first 13 layers of VGG-16 pretrained on ImageNet. Handles feature extraction.
-- **Backend** — dilated convolutional layers. Captures crowd density at multiple scales without losing spatial resolution.
+- **Frontend** — first 10 layers of VGG-16 pretrained on ImageNet. Handles feature extraction.
+- **Backend** — dilated convolutional layers (rates 1,2,2,2). Captures crowd density at multiple scales without losing spatial resolution.
 
 The model outputs a 2D density map where summing all pixel values gives the estimated head count. This avoids drawing bounding boxes around individuals, which breaks down in dense crowds.
 
@@ -33,44 +25,59 @@ The model outputs a 2D density map where summing all pixel values gives the esti
 
 ## Results
 
-| Dataset | MAE | MSE |
-|---|---|---|
-| ShanghaiTech Part B | 9.43 | — |
+| Method | MAE |
+|---|---|
+| MCNN | 26.4 |
+| CSRNet (original paper) | 10.6 |
+| CrowdSense (ours) | **9.43** |
 
-> Original CSRNet paper reports MAE of 10.6 on Part B.  
-> Our result uses fixed sigma (σ=15) density maps vs adaptive sigma in the paper — not a direct comparison.
+> Trained on ShanghaiTech Part B with fixed sigma (σ=15) density maps.
 
 ---
 
 ## Quick Start
 
-### Requirements
-- Google Colab with T4 GPU
-- Google Drive (for checkpoint storage)
+### Main Demo (no training needed)
 
-### Run the demo (no training needed)
+Open `main.ipynb` in Google Colab and run all cells top to bottom.
 
-Open `CSRNet_Final.ipynb` in Google Colab and run **Section A only** (cells A1–A5).
+1. Installs dependencies and clones CSRNet repo
+2. Downloads ShanghaiTech Part B dataset
+3. Downloads pretrained weights (epoch 73, MAE 9.43)
+4. Loads the model
+5. Launches a Gradio video demo with a public shareable link
 
-This will:
-1. Install dependencies and clone the repo
-2. Download the ShanghaiTech Part B dataset
-3. Download pretrained weights (epoch 73, MAE 9.43)
-4. Load the model
-5. Launch a Gradio demo with a public shareable link
+> Enable GPU: Runtime → Change runtime type → T4 GPU
 
 ---
 
-### Train from scratch (optional)
+### Full Web App
 
-Run **Section B** in `CSRNet_Final.ipynb`:
+**Backend:**
+```bash
+cd support
+uvicorn main:app --reload
+```
 
-1. Mount Google Drive
+**Frontend:**
+```bash
+cd support/frontend
+npm install
+npm run dev
+```
+Then open http://localhost:5173
+
+---
+
+### Train from Scratch (optional)
+
+Open `support/training.ipynb` in Google Colab and run all cells:
+
+1. Mount Google Drive for checkpoint storage
 2. Generate density maps from head annotations (~2 mins)
-3. Configure and run training (75 epochs, ~5 hours on T4)
-4. Checkpoints saved to Drive automatically
-
-Then run **Section C** to load your best checkpoint and launch the demo.
+3. Patch dataset.py paths and configure training
+4. Train for 75 epochs (~5 hours on T4)
+5. Load best checkpoint and run image demo
 
 ---
 
@@ -78,9 +85,10 @@ Then run **Section C** to load your best checkpoint and launch the demo.
 
 [ShanghaiTech Part B](https://www.kaggle.com/datasets/tthien/shanghaitech)
 
-- 400 training images, 316 test images
+- 716 training images, 316 test images
 - Ground truth: (x, y) head coordinate annotations in .mat files
 - Density maps generated using Gaussian filter with σ=15
+- Chosen over Part A for street-level moderate density scenes
 
 ---
 
@@ -92,25 +100,21 @@ Pretrained checkpoint (epoch 73, MAE 9.43):
 ---
 
 ## Project Structure
-
-```
-CSRNet-pytorch/
-├── model.py          # CSRNet architecture
-├── dataset.py        # Dataloader
-├── train.py          # Training loop
-├── config.py         # Training config
-└── utils.py          # Helper functions
-
-CSRNet_Final.ipynb    # Main notebook (demo + training)
+main.ipynb              ← entry point, video inference + Gradio demo
 README.md
-```
-
----
-
-## Base Implementation
-
-Built on top of [CommissarMa/CSRNet-pytorch](https://github.com/CommissarMa/CSRNet-pytorch).  
-Original paper: [CSRNet: Dilated Convolutional Neural Networks for Understanding the Highly Congested Scenes](https://arxiv.org/abs/1802.10062)
+requirements.txt
+data/                   ← ShanghaiTech Part B dataset
+support/
+├── training.ipynb      ← train from scratch
+├── csrnet.py           ← model load + inference functions
+├── main.py             ← FastAPI backend
+└── frontend/           ← React + Vite + Tailwind web app
+others/
+├── final_report.pdf
+├── final_presentation.pptx
+├── update_report.pdf
+├── update_presentation.pptx
+└── demo_video.mp4
 
 ---
 
@@ -118,4 +122,12 @@ Original paper: [CSRNet: Dilated Convolutional Neural Networks for Understanding
 
 - Works best on overhead/surveillance style images
 - Front-facing crowd photos give unreliable counts
-- Trained only on ShanghaiTech Part B — may not generalize to very different crowd scenarios
+- Video processing is slow on CPU — a 5s clip takes ~2 mins locally
+- Trained only on ShanghaiTech Part B — may not generalize to different crowd scenarios
+
+---
+
+## Base Implementation
+
+Built on top of [CommissarMa/CSRNet-pytorch](https://github.com/CommissarMa/CSRNet-pytorch).  
+Original paper: [CSRNet: Dilated Convolutional Neural Networks for Understanding the Highly Congested Scenes](https://arxiv.org/abs/1802.10062)

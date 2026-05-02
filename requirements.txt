@@ -1,0 +1,15 @@
+torch
+torchvision
+opencv-python
+pillow
+matplotlib
+fastapi
+uvicorn
+python-multipart
+numpy
+scipy
+kagglehub
+gradio
+pandas
+tensorboardX
+gdown
