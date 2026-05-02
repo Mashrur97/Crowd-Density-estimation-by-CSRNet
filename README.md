@@ -5,12 +5,12 @@ A web-based crowd density estimation system built on CSRNet (VGG-16 backbone, tr
 ![Demo](others/demo.gif)
 
 ## Contributors
-Group [X] — CSE428, North South University
+Group [6] — CSE468, North South University
 
 - Rulia Akter Eti
 - Rakibul Islam Regan
 - Al-Af Muktadir
-- Md. Mashrur Fardin
+- Md. Mashrur Reza
 
 ---
 
