@@ -2,6 +2,8 @@
 
 A web-based crowd density estimation system built on CSRNet (VGG-16 backbone, trained on ShanghaiTech Part B, MAE 9.43). Upload an image or video and get instant headcount, density heatmaps, threshold alerts, and exportable CSV analytics.
 
+![Demo](others/demo.gif)
+
 ## Contributors
 Group [X] — CSE428, North South University
 
